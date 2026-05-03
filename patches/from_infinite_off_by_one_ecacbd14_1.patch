@@ -1,16 +1,16 @@
 diff --git a/src/Data/Chimera/Internal.hs b/src/Data/Chimera/Internal.hs
-index 019a84c..b45d4a7 100644
+index b45d4a7..019a84c 100644
 --- a/src/Data/Chimera/Internal.hs
 +++ b/src/Data/Chimera/Internal.hs
-@@ -580,10 +580,7 @@ fromInfinite = Chimera . fromListN (bits + 1) . go0
+@@ -580,7 +580,10 @@ fromInfinite = Chimera . fromListN (bits + 1) . go0
    where
      go0 (x :< xs) = G.singleton x : go 0 xs
  
--    go k xs =
--      if k == bits
--        then []
--        else G.fromListN kk ys : go (k + 1) zs
-+    go k xs = G.fromListN kk ys : go (k + 1) zs
+-    go k xs = G.fromListN kk ys : go (k + 1) zs
++    go k xs =
++      if k == bits
++        then []
++        else G.fromListN kk ys : go (k + 1) zs
        where
          kk = 1 `shiftL` k
          (ys, zs) = Inf.splitAt kk xs
