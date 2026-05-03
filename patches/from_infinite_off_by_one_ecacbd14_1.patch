@@ -1,34 +1,16 @@
-From ecacbd147ed772a5e726fd12e97468968ba9220d Mon Sep 17 00:00:00 2001
-From: Preetham Gujjula <gitcommit@mail.preetham.io>
-Date: Thu, 11 Apr 2024 17:42:25 -0700
-Subject: [PATCH] #40 Fix fromInfinite error
-
-In the implementation of fromInfinite, we pass an infinite list to
-Data.Primitive.Array.fromListN (bits + 1), but fromListN expects a list
-a list of length (bits + 1), which results in a runtime error.
-
-To fix this, we add a check in go to break recursion and to ensure that
-the list that is passed into fromListN has length (bits + 1).
----
- src/Data/Chimera/Internal.hs | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
 diff --git a/src/Data/Chimera/Internal.hs b/src/Data/Chimera/Internal.hs
-index fea0ea3..8b9c372 100644
+index 019a84c..b45d4a7 100644
 --- a/src/Data/Chimera/Internal.hs
 +++ b/src/Data/Chimera/Internal.hs
-@@ -572,7 +572,10 @@ fromInfinite = Chimera . fromListN (bits + 1) . go0
+@@ -580,10 +580,7 @@ fromInfinite = Chimera . fromListN (bits + 1) . go0
    where
      go0 (x :< xs) = G.singleton x : go 0 xs
  
--    go k xs = G.fromListN kk ys : go (k + 1) zs
-+    go k xs =
-+      if k == bits
-+        then []
-+        else G.fromListN kk ys : go (k + 1) zs
+-    go k xs =
+-      if k == bits
+-        then []
+-        else G.fromListN kk ys : go (k + 1) zs
++    go k xs = G.fromListN kk ys : go (k + 1) zs
        where
          kk = 1 `shiftL` k
          (ys, zs) = Inf.splitAt kk xs
--- 
-2.37.1 (Apple Git-137.1)
-
